@@ -1,0 +1,111 @@
+.popular-items {
+    background-color: #fff;
+    position: relative;
+    z-index: 1;
+    padding: 4rem 0;
+
+    .section-title {
+        color: #333;
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 1.5rem;
+    }
+
+    .category-card {
+        background: white;
+        border-radius: 15px;
+        padding: 2rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+
+        &:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .star-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='%23FFD700' d='M12 .587l3.668 7.431 8.332 1.21-6.001 5.85 1.416 8.265L12 18.9l-7.415 3.896 1.416-8.265-6.001-5.85 8.332-1.21z'/%3E%3C/svg%3E") no-repeat center center;
+            opacity: 0.1;
+            z-index: -1;
+        }
+
+        .category-icon {
+            background: #fff;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
+
+            img {
+                max-width: 80%;
+                height: auto;
+                transition: transform 0.3s ease;
+            }
+
+            .drinks-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 10px;
+
+                .drink-item {
+                    width: 60px;
+                    transition: transform 0.3s ease;
+
+                    &:hover {
+                        transform: translateY(-10px);
+                    }
+                }
+            }
+        }
+
+        &:hover .category-icon img {
+            transform: scale(1.1);
+        }
+
+        .category-title {
+            margin-top: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #333;
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    .popular-items {
+        .category-card {
+            margin-bottom: 2rem;
+
+            .category-icon {
+                width: 180px;
+                height: 180px;
+            }
+
+            .category-title {
+                font-size: 1.5rem;
+            }
+
+            .drinks-container {
+                .drink-item {
+                    width: 45px;
+                }
+            }
+        }
+    }
+}
