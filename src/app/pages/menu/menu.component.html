@@ -1,0 +1,46 @@
+<div class="c-flex-col container">
+  <!-- Loading state -->
+  <div *ngIf="loading" class="loading-container">
+    <div class="spinner-border text-primary" role="status">
+      <span class="visually-hidden">Cargando...</span>
+    </div>
+  </div>
+
+  <!-- Error state -->
+  <div *ngIf="error" class="error-container">
+    <div class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+  </div>
+
+  <!-- Menu content -->
+  <ng-container *ngIf="!loading && !error">
+    <div *ngFor="let categoryId of getCategoryIds()">
+      <!-- Category header -->
+      <div class="c-flex-self-left m-5 c-flex-row gap-4">
+        <div class="c-icon">
+          <img [src]="'icon-' + itemsByCategory[categoryId].name.toLowerCase() + '.png'"
+            [alt]="itemsByCategory[categoryId].name" onerror="this.src='icon-burger.png'">
+        </div>
+        <h1>{{ itemsByCategory[categoryId].name }}</h1>
+      </div>
+
+      <!-- Category items -->
+      <div class="gallery">
+        <div class="menu-item" [ngClass]="item.price < 12 ? 'menu-item-s' : 'menu-item-l'"
+          *ngFor="let item of itemsByCategory[categoryId].items">
+          <img [src]="item.imagePath || 'hamburguesa1.png'" [alt]="item.name" onerror="this.src='hamburguesa1.png'">
+          <div class="spacer"></div>
+          <h4>{{ item.name }}</h4>
+          <h4>{{ formatPrice(item.price) }}</h4>
+          <p *ngIf="item.description" class="description">{{ item.description }}</p>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- Empty state -->
+  <div *ngIf="!loading && !error && getCategoryIds().length === 0" class="empty-container">
+    <p>No hay items disponibles en el menú</p>
+  </div>
+</div>

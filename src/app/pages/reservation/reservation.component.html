@@ -1,0 +1,36 @@
+<div class="reserva">
+    <form (ngSubmit)="onSubmit()" class="animate__animated animate__fadeIn">
+        <h1>Reserva</h1>
+
+        <div *ngIf="errorMessage" class="alert alert-danger animate__animated animate__shakeX">
+            {{ errorMessage }}
+        </div>
+
+        <div *ngIf="successMessage" class="alert alert-success animate__animated animate__bounceIn">
+            {{ successMessage }}
+        </div>
+
+        <input [(ngModel)]="nombre" name="nombre" type="text" class="form-control" id="nombre" required
+            placeholder="Nombre" [class.is-invalid]="errorMessage && !nombre">
+
+        <input [(ngModel)]="telefono" name="telefono" type="tel" class="form-control" id="telefono" required
+            placeholder="Teléfono de contacto" [class.is-invalid]="errorMessage && !telefono" pattern="[0-9]*">
+
+        <div class="c-flex-row gap-3">
+            <input [(ngModel)]="fecha" name="fecha" type="date" class="form-control" id="fecha" required
+                [class.is-invalid]="errorMessage && !fecha" [min]="today">
+
+            <input [(ngModel)]="hora" name="hora" type="time" class="form-control" id="hora" required placeholder="Hora"
+                [class.is-invalid]="errorMessage && !hora">
+
+            <input [(ngModel)]="cantidad" name="cantidad" type="number" class="form-control" id="cantidad" required
+                placeholder="¿Para cuántos?" [class.is-invalid]="errorMessage && (cantidad <= 0 || cantidad > 20)"
+                min="1" max="20">
+        </div>
+
+        <button type="submit" class="btn" [disabled]="isLoading">
+            <span *ngIf="!isLoading">Reservar</span>
+            <span *ngIf="isLoading" class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+        </button>
+    </form>
+</div>
