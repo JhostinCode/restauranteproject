@@ -1,0 +1,209 @@
+<div class="c-flex-row h-100 contenedor">
+  <div class="scroller c-flex-col">
+    <table class="table">
+      <thead>
+        <tr>
+          <th scope="col">#ID</th>
+          <th scope="col">NOMBRE</th>
+          <th scope="col">PRECIO</th>
+          <th scope="col">STOCK</th>
+          <th scope="col" id="col-opciones">OPCIONES</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of inventoryItems">
+          <th scope="row">{{ item.id }}</th>
+          <td>{{ item.name }}</td>
+          <td>S/. {{ item.unitPrice | number:'1.2-2' }}</td>
+          <td>
+            {{ item.stock }}
+            <span *ngIf="item.measurementUnit">{{ item.measurementUnit.symbol }}</span>
+          </td>
+          <td class="actions">
+            <button class="btn btn-info btn-sm" (click)="viewDetails(item)">
+              <i class="fas fa-eye"></i>
+            </button>
+            <button class="btn btn-primary btn-sm" (click)="editItem(item)">
+              <i class="fas fa-edit"></i>
+            </button>
+            <button class="btn btn-danger btn-sm" (click)="confirmDelete(item)">
+              <i class="fas fa-trash"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="detalles">
+    <div class="c-flex-col">
+      <p>Última vez actualizado</p>
+      <p>{{ lastUpdate$ | async | date:'dd/MM/yyyy HH:mm' }}</p>
+    </div>
+    <div class="c-flex-col">
+      <div class="c-flex-col gap-2 mb-3" id="detalles-low">
+        <span>Quedan menos de</span>
+        <input type="number" [(ngModel)]="stockThreshold" class="form-control form-control-sm w-auto">
+        <span>unidades en stock</span>
+        <button class="btn btn-primary btn-sm" (click)="searchBelowStock()">Buscar</button>
+      </div>
+      <table class="table table-sm" *ngIf="lowStockItems.length > 0">
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Stock</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let item of lowStockItems">
+            <td>{{ item.name }}</td>
+            <td>
+              {{ item.stock }}
+              <span *ngIf="item.measurementUnit">{{ item.measurementUnit.symbol }}</span>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+      <button class="btn-bordeado" (click)="openNewItemModal()">añadir nuevo item</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Detalles -->
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Detalles del Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedItem">
+        <div class="mb-3">
+          <strong>Nombre:</strong> {{ selectedItem.name }}
+        </div>
+        <div class="mb-3">
+          <strong>Stock:</strong> {{ selectedItem.stock }}
+          <span *ngIf="selectedItem.measurementUnit">{{ selectedItem.measurementUnit.symbol }}</span>
+        </div>
+        <div class="mb-3">
+          <strong>Precio Unitario:</strong> S/. {{ selectedItem.unitPrice | number:'1.2-2' }}
+        </div>
+        <div class="mb-3">
+          <strong>Precio Total:</strong> S/. {{ selectedItem.totalPrice | number:'1.2-2' }}
+        </div>
+        <div class="mb-3">
+          <strong>Última Actualización:</strong> {{ selectedItem.lastUpdated | date:'dd/MM/yyyy HH:mm' }}
+        </div>
+        <div class="mb-3">
+          <strong>Fecha de Creación:</strong> {{ selectedItem.createdAt | date:'dd/MM/yyyy' }}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Edición -->
+<div class="modal fade" id="editModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Editar Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedItem">
+        <form [formGroup]="editForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" formControlName="name">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Stock Actual: {{ selectedItem.stock }}</label>
+            <div class="d-flex gap-2 align-items-center">
+              <button class="btn btn-outline-primary" (click)="adjustStock('decrease')">-</button>
+              <input type="number" class="form-control" formControlName="stockAdjustment">
+              <button class="btn btn-outline-primary" (click)="adjustStock('increase')">+</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Unidad de Medida</label>
+            <select class="form-select" formControlName="measurementUnitId">
+              <option [ngValue]="null">Sin unidad</option>
+              <option *ngFor="let unit of measurementUnits" [value]="unit.id">
+                {{ unit.name }} ({{ unit.symbol }})
+              </option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="saveChanges()">Guardar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Confirmar Eliminación</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedItem">
+        <p>¿Está seguro que desea eliminar el item "{{ selectedItem.name }}"?</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-danger" (click)="deleteItem()">Eliminar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de Nuevo Item -->
+<div class="modal fade" id="newItemModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Nuevo Item</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form [formGroup]="newItemForm">
+          <div class="mb-3">
+            <label class="form-label">Nombre</label>
+            <input type="text" class="form-control" formControlName="name">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Precio Unitario</label>
+            <input type="number" class="form-control" formControlName="unitPrice">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Stock Inicial</label>
+            <input type="number" class="form-control" formControlName="stock">
+          </div>
+          <div class="mb-3">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" formControlName="hasMeasurementUnit">
+              <label class="form-check-label">¿Tiene unidad de medida?</label>
+            </div>
+          </div>
+          <div class="mb-3" *ngIf="newItemForm.get('hasMeasurementUnit')?.value">
+            <label class="form-label">Unidad de Medida</label>
+            <select class="form-select" formControlName="measurementUnitId">
+              <option [ngValue]="null">Seleccione una unidad</option>
+              <option *ngFor="let unit of measurementUnits" [value]="unit.id">
+                {{ unit.name }} ({{ unit.symbol }})
+              </option>
+            </select>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" class="btn btn-primary" (click)="createItem()">Crear Item</button>
+      </div>
+    </div>
+  </div>
+</div>

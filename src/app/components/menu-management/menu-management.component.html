@@ -1,0 +1,256 @@
+<div class="container-fluid">
+    <div class="row mb-3">
+        <div class="col">
+            <h2>Gestión del Menú</h2>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-primary me-2" (click)="openNewItemModal()">
+                <i class="fas fa-plus"></i> Nuevo Item
+            </button>
+            <button class="btn btn-secondary" (click)="openCategoryModal()">
+                <i class="fas fa-folder-plus"></i> Nueva Categoría
+            </button>
+        </div>
+    </div>
+
+    <!-- Error message -->
+    <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+        {{ errorMessage }}
+    </div>
+
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Categoría</th>
+                    <th>Estado</th>
+                    <th>Opciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let item of menuItems">
+                    <td>{{ item.name }}</td>
+                    <td>S/. {{ item.price | number:'1.2-2' }}</td>
+                    <td>{{ item.category.name }}</td>
+                    <td>
+                        <span class="badge" [class.bg-success]="item.available" [class.bg-danger]="!item.available">
+                            {{ item.available ? 'Disponible' : 'No Disponible' }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-info btn-sm me-1" (click)="viewDetails(item)">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="btn btn-primary btn-sm me-1" (click)="editItem(item)">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm" (click)="confirmDelete(item)">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal de Detalles -->
+<div class="modal fade" id="itemDetailsModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles del Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" *ngIf="selectedItem">
+                <div class="text-center mb-3" *ngIf="selectedItem.imagePath">
+                    <img [src]="selectedItem.imagePath" class="img-fluid rounded" style="max-height: 200px;">
+                </div>
+                <div class="mb-3">
+                    <strong>Nombre:</strong> {{ selectedItem.name }}
+                </div>
+                <div class="mb-3">
+                    <strong>Precio:</strong> S/. {{ selectedItem.price | number:'1.2-2' }}
+                </div>
+                <div class="mb-3">
+                    <strong>Categoría:</strong> {{ selectedItem.category.name }}
+                </div>
+                <div class="mb-3">
+                    <strong>Descripción:</strong> {{ selectedItem.description }}
+                </div>
+                <div class="mb-3">
+                    <strong>Estado:</strong>
+                    <span class="badge" [class.bg-success]="selectedItem.available"
+                        [class.bg-danger]="!selectedItem.available">
+                        {{ selectedItem.available ? 'Disponible' : 'No Disponible' }}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Edición -->
+<div class="modal fade" id="editItemModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Editar Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form [formGroup]="itemForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" formControlName="name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Precio</label>
+                        <input type="number" class="form-control" formControlName="price">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categoría</label>
+                        <select class="form-select" formControlName="categoryId">
+                            <option [ngValue]="null">Seleccione una categoría</option>
+                            <option *ngFor="let category of categories" [value]="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" formControlName="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL de la Imagen</label>
+                        <input type="text" class="form-control" formControlName="imagePath"
+                            placeholder="/cocacola.png o https://ejemplo.com/imagen.jpg">
+                        <small class="form-text text-muted">
+                            Puedes usar una ruta relativa (/cocacola.png) o una URL completa (https://...)
+                        </small>
+                    </div>
+                    <div class="text-center mb-3" *ngIf="itemForm.get('imagePath')?.value">
+                        <img [src]="itemForm.get('imagePath')?.value" class="img-fluid rounded"
+                            style="max-height: 200px;">
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" formControlName="available">
+                            <label class="form-check-label">Disponible</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="saveItem()">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Nuevo Item -->
+<div class="modal fade" id="menuNewItemModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nuevo Item</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Error message -->
+                <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+                    {{ errorMessage }}
+                </div>
+                <form [formGroup]="itemForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" formControlName="name">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Precio</label>
+                        <input type="number" class="form-control" formControlName="price">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Categoría</label>
+                        <select class="form-select" formControlName="categoryId">
+                            <option [ngValue]="null">Seleccione una categoría</option>
+                            <option *ngFor="let category of categories" [value]="category.id">
+                                {{ category.name }}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Descripción</label>
+                        <textarea class="form-control" formControlName="description" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">URL de la Imagen</label>
+                        <input type="text" class="form-control" formControlName="imagePath"
+                            placeholder="/cocacola.png o https://ejemplo.com/imagen.jpg">
+                        <small class="form-text text-muted">
+                            Puedes usar una ruta relativa (/cocacola.png) o una URL completa (https://...)
+                        </small>
+                    </div>
+                    <div class="text-center mb-3" *ngIf="itemForm.get('imagePath')?.value">
+                        <img [src]="itemForm.get('imagePath')?.value" class="img-fluid rounded"
+                            style="max-height: 200px;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="saveItem()">Crear</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Confirmación de Eliminación -->
+<div class="modal fade" id="deleteItemModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirmar Eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" *ngIf="selectedItem">
+                <p>¿Está seguro que desea eliminar el item "{{ selectedItem.name }}"?</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-danger" (click)="deleteItem()">Eliminar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de Nueva Categoría -->
+<div class="modal fade" id="categoryModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Nueva Categoría</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Error message -->
+                <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+                    {{ errorMessage }}
+                </div>
+                <form [formGroup]="categoryForm">
+                    <div class="mb-3">
+                        <label class="form-label">Nombre</label>
+                        <input type="text" class="form-control" formControlName="name">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-primary" (click)="createCategory()">Crear</button>
+            </div>
+        </div>
+    </div>
+</div>

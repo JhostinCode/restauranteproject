@@ -1,0 +1,242 @@
+.contenedor {
+  padding: 1rem;
+  gap: 2rem;
+  height: 100% !important;
+}
+
+.scroller {
+  flex: 1;
+  overflow-y: auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  padding: 1rem;
+}
+
+#col-opciones {
+  width: 2em !important;
+}
+
+.detalles {
+  height: 100%;
+  width: 300px;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+
+  > div {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    padding: 1rem;
+  }
+  > div:nth-of-type(2){
+    height: 100% !important;
+    justify-content: space-around;
+  }
+}
+
+.table {
+  margin-bottom: 0;
+
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+  }
+
+  td, th {
+    vertical-align: middle;
+    padding: 0.75rem;
+  }
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  
+  button {
+    padding: 0.25rem 0.5rem;
+    
+    i {
+      font-size: 0.875rem;
+    }
+  }
+}
+
+.btn-bordeado {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid #EC3535;
+  background: transparent;
+  color: #EC3535;
+  border-radius: 8px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background: #EC3535;
+    color: white;
+  }
+}
+
+// Estilos para los modales
+.modal-content {
+  border-radius: 8px;
+  border: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.modal-header {
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #dee2e6;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+
+  .modal-title {
+    font-weight: 600;
+    color: #212529;
+  }
+}
+
+.modal-footer {
+  border-top: 1px solid #dee2e6;
+  padding: 1rem;
+}
+
+// Estilos para los formularios
+.form-label {
+  font-weight: 500;
+  color: #495057;
+  margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  padding: 0.5rem 0.75rem;
+  
+  &:focus {
+    border-color: #86b7fe;
+    box-shadow: 0 0 0 0.25rem rgba(13,110,253,.25);
+  }
+}
+
+// Estilos para la tabla de stock bajo
+.table-sm {
+  font-size: 0.875rem;
+  
+  th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+  }
+}
+
+// Estilos para el input de búsqueda
+.form-control-sm {
+  height: calc(1.5em + 0.5rem + 2px);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.875rem;
+  border-radius: 0.2rem;
+}
+
+// Animaciones para los modales
+.modal.fade .modal-dialog {
+  transition: transform 0.2s ease-out;
+}
+
+.modal.show .modal-dialog {
+  transform: none;
+}
+
+// Estilos para mensajes de validación
+.invalid-feedback {
+  display: block;
+  font-size: 0.875rem;
+  color: #EC3535;
+  margin-top: 0.25rem;
+}
+
+// Estilos para los botones de ajuste de stock
+.d-flex.gap-2 {
+  .btn-outline-primary {
+    min-width: 40px;
+    height: 38px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+  }
+}
+
+// Estilos para el checkbox de unidad de medida
+.form-check {
+  padding-left: 1.75rem;
+  margin-bottom: 1rem;
+
+  .form-check-input {
+    margin-left: -1.75rem;
+  }
+
+  .form-check-label {
+    font-weight: 500;
+  }
+}
+
+.detalles {
+  color: #EC3535;
+  font-weight: 700;
+}
+
+#detalles-low input{
+  border:#EC3535 3px solid;
+  border-radius: 1em;
+  width: 5em !important;
+  color: #EC3535;
+}
+
+#detalles-low button {
+  background-color: #EC3535;
+  border: none;
+}
+
+@media only screen and (max-width: 1100px){
+  .contenedor {
+    flex-direction: column-reverse;
+    
+    .detalles {
+      flex-direction: row;
+      height: auto !important;
+      width: auto;
+      *{
+        flex-direction: row;
+      }
+    }
+  }
+}
+
+@media only screen and (max-width: 950px) {
+  .detalles {
+    flex-direction: column !important;
+    > * {
+      min-height: 5em;
+      width: 100% !important;
+    }
+    > *:nth-of-type(2){
+      flex-direction: row !important;
+    }
+    *{
+      flex-direction: column !important;
+    }
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  
+  .detalles {
+    > *:nth-of-type(2){
+      flex-direction: column !important;
+    }
+  }
+}

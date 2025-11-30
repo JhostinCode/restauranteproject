@@ -1,0 +1,169 @@
+<div class="container-fluid p-4">
+    <div class="row mb-4">
+        <div class="col">
+            <h2>Gestión de Reservas</h2>
+        </div>
+    </div>
+
+    <!-- Mensajes de error y éxito -->
+    <div *ngIf="errorMessage" class="alert alert-danger mb-3">
+        {{ errorMessage }}
+    </div>
+    <div *ngIf="successMessage" class="alert alert-success mb-3">
+        {{ successMessage }}
+    </div>
+
+    <!-- Filtros -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" placeholder="Buscar por nombre..." [(ngModel)]="searchTerm"
+                        (keyup.enter)="onSearch()">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" [(ngModel)]="startDate" (change)="onSearch()">
+                </div>
+                <div class="col-md-2">
+                    <input type="date" class="form-control" [(ngModel)]="endDate" (change)="onSearch()">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" [(ngModel)]="statusFilter" (change)="onSearch()">
+                        <option value="">Todos los estados</option>
+                        <option value="PENDIENTE">Pendiente</option>
+                        <option value="CONFIRMADO">Confirmada</option>
+                        <option value="CANCELADO">Cancelada</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button class="btn btn-secondary me-2" (click)="clearFilters()">
+                        Limpiar filtros
+                    </button>
+                    <button class="btn btn-primary" (click)="onSearch()">
+                        Buscar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tabla de reservas -->
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Teléfono</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Personas</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let reservation of reservations">
+                    <td>{{ reservation.id }}</td>
+                    <td>{{ reservation.name }}</td>
+                    <td>{{ reservation.phone }}</td>
+                    <td>{{ reservation.date | date:'dd/MM/yyyy' }}</td>
+                    <td>{{ reservation.time }}</td>
+                    <td>{{ reservation.guests }}</td>
+                    <td>
+                        <span [class]="getStatusClass(reservation.status)">
+                            {{ reservation.status }}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-info btn-sm me-1" (click)="viewDetails(reservation)"
+                            title="Ver detalles">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                        <div class="btn-group" role="group">
+                            <button class="btn btn-success btn-sm me-1"
+                                (click)="updateStatus(reservation, 'CONFIRMADO')"
+                                [disabled]="reservation.status === 'CONFIRMADO'" title="Confirmar">
+                                <i class="fas fa-check"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm" (click)="updateStatus(reservation, 'CANCELADO')"
+                                [disabled]="reservation.status === 'CANCELADO'" title="Cancelar">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <button class="btn btn-danger btn-sm ms-1" (click)="deleteReservation(reservation.id)"
+                            title="Eliminar">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+                <tr *ngIf="reservations.length === 0">
+                    <td colspan="8" class="text-center">No hay reservas disponibles</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Paginación -->
+    <div class="d-flex justify-content-between align-items-center mt-3">
+        <div>
+            Mostrando {{ reservations.length }} de {{ totalElements }} reservas
+        </div>
+        <nav *ngIf="totalElements > pageSize">
+            <ul class="pagination mb-0">
+                <li class="page-item" [class.disabled]="currentPage === 0">
+                    <button class="page-link" (click)="onPageChange(currentPage - 1)">Anterior</button>
+                </li>
+                <li class="page-item"
+                    *ngFor="let page of [].constructor(Math.ceil(totalElements / pageSize)); let i = index"
+                    [class.active]="i === currentPage">
+                    <button class="page-link" (click)="onPageChange(i)">{{ i + 1 }}</button>
+                </li>
+                <li class="page-item" [class.disabled]="currentPage >= (totalElements / pageSize) - 1">
+                    <button class="page-link" (click)="onPageChange(currentPage + 1)">Siguiente</button>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<!-- Modal de Detalles -->
+<div class="modal fade" id="reservationDetailsModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detalles de la Reserva</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body" *ngIf="selectedReservation">
+                <div class="mb-3">
+                    <strong>Nombre:</strong> {{ selectedReservation.name }}
+                </div>
+                <div class="mb-3">
+                    <strong>Teléfono:</strong> {{ selectedReservation.phone }}
+                </div>
+                <div class="mb-3">
+                    <strong>Fecha:</strong> {{ selectedReservation.date | date:'dd/MM/yyyy' }}
+                </div>
+                <div class="mb-3">
+                    <strong>Hora:</strong> {{ selectedReservation.time }}
+                </div>
+                <div class="mb-3">
+                    <strong>Cantidad de personas:</strong> {{ selectedReservation.guests }}
+                </div>
+                <div class="mb-3">
+                    <strong>Estado:</strong>
+                    <span [class]="getStatusClass(selectedReservation.status)">
+                        {{ selectedReservation.status }}
+                    </span>
+                </div>
+                <div class="mb-3">
+                    <strong>Creada:</strong> {{ selectedReservation.createdAt | date:'dd/MM/yyyy HH:mm' }}
+                </div>
+                <div class="mb-3">
+                    <strong>Última actualización:</strong> {{ selectedReservation.updatedAt | date:'dd/MM/yyyy HH:mm' }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
