@@ -1,0 +1,165 @@
+<div class="order-management">
+    <div class="row">
+        <!-- Formulario de Nueva Orden -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Nueva Orden</h3>
+                </div>
+                <div class="card-body">
+                    <form [formGroup]="orderForm" (ngSubmit)="submitOrder()">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="tableNumber">Número de Mesa</label>
+                                    <input type="number" id="tableNumber" formControlName="tableNumber"
+                                        class="form-control" min="1">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="type">Tipo de Orden</label>
+                                    <select id="type" formControlName="type" class="form-control">
+                                        <option [value]="'DINE_IN'">Para Comer Aquí</option>
+                                        <option [value]="'DELIVERY'">Delivery</option>
+                                        <option [value]="'PICKUP'">Para Llevar</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mt-3" *ngIf="orderForm.get('type')?.value !== 'DINE_IN'">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="customerName">Nombre del Cliente</label>
+                                    <input type="text" id="customerName" formControlName="customerName"
+                                        class="form-control">
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label for="customerPhone">Teléfono</label>
+                                    <input type="tel" id="customerPhone" formControlName="customerPhone"
+                                        class="form-control">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Lista de Items -->
+                        <div class="items-list mt-4">
+                            <h4>Items de la Orden</h4>
+                            <div formArrayName="items">
+                                <div *ngFor="let item of orderItems.controls; let i = index" [formGroupName]="i"
+                                    class="item-row">
+                                    <div class="row align-items-center">
+                                        <div class="col">
+                                            <strong>{{ item.get('item')?.value?.name }}</strong>
+                                            <span class="text-muted">S/. {{ item.get('item')?.value?.price }}</span>
+                                        </div>
+                                        <div class="col-3">
+                                            <input type="number" formControlName="quantity" class="form-control"
+                                                min="1">
+                                        </div>
+                                        <div class="col-auto">
+                                            <button type="button" class="btn btn-danger btn-sm"
+                                                (click)="removeItemFromOrder(i)">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="row mt-2">
+                                        <div class="col">
+                                            <input type="text" formControlName="notes" class="form-control"
+                                                placeholder="Notas especiales...">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Menú de Items Disponibles -->
+                        <div class="available-items mt-4">
+                            <h4>Menú Disponible</h4>
+                            <div class="row">
+                                <div class="col-md-4" *ngFor="let item of menuItems">
+                                    <div class="card menu-item" (click)="addItemToOrder(item)">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ item.name }}</h5>
+                                            <p class="card-text">S/. {{ item.price }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="alert alert-danger mt-3" *ngIf="error">
+                            {{ error }}
+                        </div>
+
+                        <button type="submit" class="btn btn-primary mt-4 w-100"
+                            [disabled]="!orderForm.valid || loading">
+                            <span class="spinner-border spinner-border-sm me-2" *ngIf="loading"></span>
+                            {{ loading ? 'Creando orden...' : 'Crear Orden' }}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de Órdenes Actuales -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h3>Órdenes Actuales</h3>
+                </div>
+                <div class="card-body">
+                    <div class="orders-list">
+                        <div *ngFor="let order of currentOrders" class="order-card mb-3">
+                            <div class="card">
+                                <div class="card-header d-flex justify-content-between align-items-center">
+                                    <h5 class="mb-0">Mesa #{{ order.tableNumber }}</h5>
+                                    <span [class]="'badge ' + (order.status === 'PENDING' ? 'bg-warning' : 
+                                          order.status === 'IN_PROGRESS' ? 'bg-info' : 
+                                          order.status === 'READY' ? 'bg-success' : 
+                                          order.status === 'DELIVERED' ? 'bg-primary' : 'bg-danger')">
+                                        {{ order.status }}
+                                    </span>
+                                </div>
+                                <div class="card-body">
+                                    <div class="items-summary">
+                                        <div *ngFor="let item of order.items"
+                                            class="d-flex justify-content-between mb-2">
+                                            <span>{{ item.quantity }}x {{ item.item.name }}</span>
+                                            <span>S/. {{ item.subtotal }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="total mt-3 d-flex justify-content-between">
+                                        <strong>Total:</strong>
+                                        <strong>S/. {{ order.total }}</strong>
+                                    </div>
+                                    <div class="status-actions mt-3">
+                                        <button class="btn btn-sm btn-info me-2"
+                                            (click)="updateOrderStatus(order.id!, OrderStatus.IN_PROGRESS)"
+                                            *ngIf="order.status === OrderStatus.PENDING">
+                                            En Preparación
+                                        </button>
+                                        <button class="btn btn-sm btn-success me-2"
+                                            (click)="updateOrderStatus(order.id!, OrderStatus.READY)"
+                                            *ngIf="order.status === OrderStatus.IN_PROGRESS">
+                                            Lista
+                                        </button>
+                                        <button class="btn btn-sm btn-primary"
+                                            (click)="updateOrderStatus(order.id!, OrderStatus.DELIVERED)"
+                                            *ngIf="order.status === OrderStatus.READY">
+                                            Entregada
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
