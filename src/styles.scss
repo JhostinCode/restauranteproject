@@ -1,4 +1,3 @@
-@use "sass:color";
 /* You can add global styles to this file, and also import other style files */
 
 // Variables
@@ -61,7 +60,7 @@ body,html {
   border-radius: 25px;
   
   &:hover {
-    background-color: color.adjust($primary-color, $lightness: -10%);
+    background-color: darken($primary-color, 10%);
   }
 }
 
