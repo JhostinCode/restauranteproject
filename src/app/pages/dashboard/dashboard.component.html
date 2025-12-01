@@ -1,0 +1,49 @@
+<app-dashboard-nav></app-dashboard-nav>
+<div class="contenedor">
+  <ul class="nav nav-tabs" id="myTab" role="tablist">
+    <li class="nav-item" role="presentation">
+      <button class="nav-link active" id="inventario-tab" data-bs-toggle="tab" data-bs-target="#inventario-tab-pane"
+        type="button" role="tab" aria-controls="inventario-tab-pane" aria-selected="true">
+        <img src="icon-dashboard-storage.png" alt="">
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="menu-tab" data-bs-toggle="tab" data-bs-target="#menu-tab-pane" type="button"
+        role="tab" aria-controls="menu-tab-pane" aria-selected="false">
+        <img src="icon-burger.png" alt="">
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="ventas-tab" data-bs-toggle="tab" data-bs-target="#ventas-tab-pane" type="button"
+        role="tab" aria-controls="ventas-tab-pane" aria-selected="false">
+        <img src="icon-dashboard-sales.png" alt="">
+      </button>
+    </li>
+    <li class="nav-item" role="presentation">
+      <button class="nav-link" id="reservas-tab" data-bs-toggle="tab" data-bs-target="#reservas-tab-pane" type="button"
+        role="tab" aria-controls="reservas-tab-pane" aria-selected="false">
+        <img src="icon-dashboard-reservas.png" alt="">
+      </button>
+    </li>
+
+  </ul>
+  <div class="tab-content" id="myTabContent">
+    <div class="tab-pane fade show active" id="inventario-tab-pane" role="tabpanel" aria-labelledby="inventario-tab"
+      tabindex="0">
+      <app-inventario></app-inventario>
+    </div>
+    <div class="tab-pane fade" id="menu-tab-pane" role="tabpanel" aria-labelledby="menu-tab" tabindex="0">
+      <app-menu-management></app-menu-management>
+    </div>
+    <div class="tab-pane fade" id="ventas-tab-pane" role="tabpanel" aria-labelledby="ventas-tab" tabindex="0">
+      <app-sales-management></app-sales-management>
+    </div>
+    <div class="tab-pane fade" id="reservas-tab-pane" role="tabpanel" aria-labelledby="reservas-tab" tabindex="0">
+      <app-reservation-management></app-reservation-management>
+    </div>
+    <div class="tab-pane fade" id="trabajadores-tab-pane" role="tabpanel" aria-labelledby="trabajadores-tab"
+      tabindex="0">
+      trabajadores
+    </div>
+  </div>
+</div>
