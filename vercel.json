@@ -1,0 +1,23 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "package.json",
+      "use": "@vercel/angular"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/dist/restaurante/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/dist/restaurante/index.html"
+    }
+  ],
+  "buildCommand": "npm run build -- --configuration=production",
+  "outputDirectory": "dist/restaurante",
+  "devCommand": "npm start",
+  "installCommand": "npm install"
+}
